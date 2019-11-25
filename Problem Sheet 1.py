@@ -80,7 +80,7 @@ class Vector:
         Return the subtraction of vector 'v' from this vector
         '''
         u = +self
-        u += -v
+        u -= v
         return u
     def __invert__(self):
         '''
@@ -99,14 +99,14 @@ class Vector:
         if isinstance(v, (int, float)):
             for i in range(0, len(self)):
                 self[i] *= v
-        elif isinstance(v, Vector):     
+        elif isinstance(v, Vector):
             u = +self                   #if v is a vetor, each element of this
             self = 0                    #vector is multiplied by the corresponding
             for i in range(0, len(u)):  #element of v, then summing over all elements;
                 self += u[i]*v[i]       #effectively transposing vector 'v'
         elif isinstance(v, Matrix):
             u = []
-            for i in range(0, 4):
+            for i in range(4):
                 u.append(self[i])       #transposing vector
             u *= v
             self = u
@@ -118,7 +118,7 @@ class Vector:
         '''
         u = +self
         u *= v
-        return u                      
+        return u
     def __rmul__(self, v):
         '''
         Return the multiplication of this vector with
@@ -204,26 +204,26 @@ class Matrix:
         Return a copy of this matrix with the '+' operator applied to each
         element
         '''
-        return self.__class__([+self[0, j] for j in range(0, 4)],
-                              [+self[1, j] for j in range(0, 4)],
-                              [+self[2, j] for j in range(0, 4)],
-                              [+self[3, j] for j in range(0, 4)])
+        return self.__class__([+self[0, j] for j in range(4)],
+                              [+self[1, j] for j in range(4)],
+                              [+self[2, j] for j in range(4)],
+                              [+self[3, j] for j in range(4)])
     def __neg__(self):
         '''
         Return a copy of this matrix with the '-' operator applied to each
         element
         '''
-        return self.__class__([-self[0, j] for j in range(0, 4)],
-                              [-self[1, j] for j in range(0, 4)],
-                              [-self[2, j] for j in range(0, 4)],
-                              [-self[3, j] for j in range(0, 4)])
+        return self.__class__([-self[0, j] for j in range(4)],
+                              [-self[1, j] for j in range(4)],
+                              [-self[2, j] for j in range(4)],
+                              [-self[3, j] for j in range(4)])
     def __iadd__(self, m):
         '''
         Augmented assignment '+=' for adding a matrix 'm' to this matrix
         element-wise
         '''
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 self[i, j] += m[i, j]
         return self
     def __isub__(self, m):
@@ -231,8 +231,8 @@ class Matrix:
         Augmented assignment '-=' for subtracting a matrix 'm' from
         this matrix element-wise
         '''
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 self[i, j] -= m[i, j]
         return self
     def __add__(self, m):
@@ -255,8 +255,8 @@ class Matrix:
         '''
         u = +self
         a = u - u   #creates a 4 x 4 matrix of zeros
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 if isinstance(u[i, j], complex):
                     u[i, j] = complex(u[i, j].real, -u[i, j].imag)
                 a[i, j] = u[j, i]
@@ -267,28 +267,28 @@ class Matrix:
         with a scalar, vector (transposed or not) or matrix 'm'
         '''
         if isinstance(m, (int, float)):
-            for i in range(0, 4):
-                for j in range(0, 4):
+            for i in range(4):
+                for j in range(4):
                     self[i, j] *= m
         elif isinstance(m, Vector):
             u = +self
             self = m - m
-            for i in range(0, 4):
-                for j in range(0, 4):
+            for i in range(4):
+                for j in range(4):
                     self[i] += u[i, j]*m[j]
         elif isinstance(m, Matrix):
             u = +self
             self = self - self
-            for i in range(0, 4):
-                for j in range(0, 4):
-                    for k in range(0, 4):
+            for i in range(4):
+                for j in range(4):
+                    for k in range(4):
                         self[i, j] += u[i, k]*m[k, j]
         elif isinstance(m, list):       #list is transposed vector
             u = +self
             self = []
-            for j in range(0, 4):
+            for j in range(4):
                 a = 0
-                for i in range(0, 4):
+                for i in range(4):
                     a += m[i]*u[i, j]
                 self.append(a)
         return self
@@ -313,8 +313,8 @@ class Matrix:
         Augmented assignment '/=' for dividing this matrix
         by a scalar 's'
         '''
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 self[i, j] /= s
         return self
     def __truediv__(self, s):
@@ -330,8 +330,8 @@ class Matrix:
         '''
         conj = ~self
         u = 0
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 u += conj[i, j]*self[j, i]
         return u**(1/2)
     def __ipow__(self, p):
@@ -345,8 +345,8 @@ class Matrix:
                 self *= u
         elif p == 0:
             self = u - u        #creating 4 x 4 matrix of zeros
-            for i in range(0, 4):
-                for j in range(0, 4):
+            for i in range(4):
+                for j in range(4):
                     if i == j:
                         self[i, j] = 1
         return self
@@ -381,34 +381,39 @@ class BoostMatrix(Matrix):
     '''
     Class representing a Lorentz Boost matrix
     '''
-    def __init__(self, q_mu):
+    def __init__(self, q_mu0=None, q_mu1=None, q_mu2=None, q_mu3=None):
         '''
         Initialise the class with its four components
         '''
-        B_x = q_mu[1]/q_mu[0]
-        B_y = q_mu[2]/q_mu[0]
-        B_z = q_mu[3]/q_mu[0]
-        B = (B_x**2 + B_y**2 + B_z**2)**(1/2)
-        gamma = 1/((1 - B**2)**(1/2))
-        alpha = (gamma**2)/(1 + gamma)
-        m0 = [gamma, -gamma*B_x, -gamma*B_y, -gamma*B_z]
-        m1 = [-gamma*B_x, 1 + alpha*(B_x**2), alpha*B_x*B_y, alpha*B_x*B_z]
-        m2 = [-gamma*B_y, alpha*B_y*B_x, 1 + alpha*(B_y**2), alpha*B_y*B_z]
-        m3 = [-gamma*B_z, alpha*B_z*B_x, alpha*B_z*B_y, 1 + alpha*(B_z**2)]
-        self.m = [m0, m1, m2, m3]
+        if q_mu0 and q_mu1 and q_mu2 and q_mu3:
+            super().__init__(q_mu0, q_mu1, q_mu2, q_mu3)
+        
+        else: 
+            q_mu = q_mu0
+            B_x = q_mu[1]/q_mu[0]
+            B_y = q_mu[2]/q_mu[0]
+            B_z = q_mu[3]/q_mu[0]
+            B = (B_x**2 + B_y**2 + B_z**2)**(1/2)
+            try:
+                gamma = 1/((1 - B**2)**(1/2))
+            except ZeroDivisionError:
+                print('Error: Division by zero; Boost is too large! Try smaller momentum values')
+            alpha = (gamma**2)/(1 + gamma)
+            m0 = [gamma, -gamma*B_x, -gamma*B_y, -gamma*B_z]
+            m1 = [-gamma*B_x, 1 + alpha*(B_x**2), alpha*B_x*B_y, alpha*B_x*B_z]
+            m2 = [-gamma*B_y, alpha*B_y*B_x, 1 + alpha*(B_y**2), alpha*B_y*B_z]
+            m3 = [-gamma*B_z, alpha*B_z*B_x, alpha*B_z*B_y, 1 + alpha*(B_z**2)]
+            super(BoostMatrix, self).__init__(m0, m1, m2, m3)
 if __name__ == "__main__":
-#    C = Vector(1, 2, 3, 4)
-#    D = Vector(1+1j, 2j, 3+4j, 5)
-#    E = Vector(4, -3, -2, 1)
-#    print(C*E)
-#    print(E*C)
-#    print(abs(D))
-#    print(+E)
-#    A = Matrix([1, 2j, -3-4j, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4])
-#    B = Matrix([4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1])
-#    C = Matrix([1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1])
-#    D = Vector(2, 1, 2, 1)
-#    print(A**0)
-     A = FourVector(1, 2, 3, 4)
-     B = BoostMatrix(A)
-     print(type(B))
+    p = 7000        #In the lab frame, two protons are travelling at equal and opposite z-momentum
+    m = 0.983       #mass of a proton in GeV
+    E = (p**2 + m**2)**(1/2.)   #When a particle, Q, is multiplied by a boost matrix created using a particle, P,
+    Q = FourVector(E, 0, 0, p)  #the momentum of particle Q in the rest frame of P is returned, which gives the
+    P = FourVector(E, 0, 0, -p) #momentum of Q required to create the same C.O.M. energy when P is at rest
+    Boo = BoostMatrix(P)
+    Q2 = Boo*Q
+    print('The absolute momentum of particles in the lab frame is {} GeV'.format(p))
+    print('Mass of a proton is {} GeV'.format(m))
+    print('Energy = (p^2 + m^2)^0.5 = {} GeV'.format(E))
+    print('The z-momentum of Q required in this case is {} GeV'.format(Q2[3]))
+    
